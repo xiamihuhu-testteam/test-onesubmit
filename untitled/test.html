@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    * {
+        margin:0;
+        padding:0;
+        list-style:none;
+    }
+    .eStep-warp {
+        width:600px;
+        position:relative;
+        margin:0 auto;
+        margin-top:100px;
+    }
+    .eStep {
+        display:flex;
+        width:100%;
+    }
+    .eStep-item {
+        flex:1;
+        height:10px;
+        background:#e4e4e4;
+        position:relative;
+    }
+    i {
+        text-decoration:none;
+        font-style:normal;
+        font-size:13px;
+    }
+    .eStep-progress {
+        width:0;
+        height:8px;
+        position:absolute;
+        left:0;
+        top:0;
+        background:#34c9f4;
+    }
+    /*进度条结束*/
+    .eStep--point-warp {
+        position:absolute;
+        left:0;
+        top:0;
+        width:100%;
+        height:50px;
+    }
+    .eStep--point-item {
+        position:absolute;
+        top:-10px;
+        display:block;
+        height:50px;
+    }
+    .eStep--point {
+        display:block;
+        -webkit-box-sizing:border-box;
+        -moz-box-sizing:border-box;
+        box-sizing:border-box;
+        width:26px;
+        height:26px;
+        line-height:26px;
+        color:#fff;
+        text-align:center;
+        position:absolute;
+        top:0px;
+        left:-2px;
+        background:#e4e4e4;
+        border:3px solid #e4e4e4;
+        -webkit-border-radius:50%;
+        -moz-border-radius:50%;
+        border-radius:50%;
+    }
+    .eStep--point.done {
+        width:30px;
+        height:30px;
+        background:#34c9f4;
+        -webkit-transition:0.3s all ease;
+        -moz-transition:0.3s all ease;
+        -ms-transition:0.3s all ease;
+        -o-transition:0.3s all ease;
+        transition:0.3s all ease;
+    }
+    .eStep--point.done:hover {
+        -webkit-transform:scale(1.2);
+        -moz-transform:scale(1.2);
+        -ms-transform:scale(1.2);
+        -o-transform:scale(1.2);
+        transform:scale(1.2);
+    }
+    .eStep--text {
+        display:inline-block;
+        width:100%;
+        position:absolute;
+        bottom:0;
+        left:0;
+        text-align:left;
+    }
+
+</style>
+<script src="jquery-1.11.3.min.js"></script>
+<body>
+<div class="eStep-warp" id="step1">
+
+
+
+
+</div>
+</body>
+<script>
+    (function($) {
+        $.fn.extend({
+            loadStep: function(params) {
+                var stepArr = params.steps;
+                var $this = $(this);
+                var createStep = function(len) {
+                    var step = '<ul class="eStep"></ul>';
+                    var $step = $(step);
+
+                    for (var i = 0; i < len; i++) {
+                        var stepItem = '<li class="eStep-item"></li>';
+                        $step.append(stepItem);
+                    }
+                    $this.append($step);
+                }
+                var createPoint = function(stepArr) {
+                    var pointWarp = '<div class="eStep--point-warp"></div>';
+                    $this.append(pointWarp);
+                    var length = stepArr.length;
+                    var everyStepLength = $this.width() / (length - 1);
+                    var everyWidth = $this.width() / length;
+                    $(stepArr).each(function(index, item) {
+                        var itemHtml = ' <span class="eStep--point-item">' +
+                            '<i class="eStep--point">' + (index + 1) + '</i>' +
+                            '<i class="eStep--text">' + item.text + '</i>' +
+                            '</span>';
+                        var $itemHtml = $(itemHtml);
+                        $itemHtml.css({
+                            'left': index * everyStepLength + 'px',
+                            width: everyWidth + 'px'
+                        });
+                        $('.eStep--point-warp').append($itemHtml);
+                    })
+                }
+                var createProgress = function() {
+                    var sProgress = '<div class="eStep-progress"></div>';
+                    $this.append(sProgress);
+                }
+                createStep(stepArr.length - 1);
+                createProgress();
+                createPoint(stepArr);
+            },
+            setStep: function(step) {
+                var setPoint = function() {
+                    var $stepPointItem = $('.eStep--point-item');
+                    for (var j = 0; j < $stepPointItem.length; j++) {
+                        var $point = $stepPointItem.eq(j).find('.eStep--point');
+                        if (j <= step) {
+                            $point.addClass('done');
+                        }
+                    }
+                }
+                setPoint();
+                var $this = $(this);
+                var setProgress = function() {
+                    var $progress = $this.find('.eStep-progress');
+                    var totalWidth = $this.width();
+                    var allLength = $this.find('.eStep-item').length;
+                    var everyProgressLength = totalWidth / allLength;
+                    if (step > allLength) {
+                        step = allLength;
+                    }
+                    $progress.animate({
+                        width: everyProgressLength * step
+                    });
+                    //$progress.width(everyProgressLength*step);
+                }
+                setProgress();
+
+            }
+        })
+    })(jQuery)
+    $(function() {
+        $('#step1').loadStep({
+            steps: [{
+                text: '申请'
+            }, {
+                text: '审计'
+            }, {
+                text: '线下审批'
+            }, {
+                text: '授权'
+            }, {
+                text: '完成'
+            }]
+        });
+        $('#step1').setStep(3);
+    })
+</script>
+</html>
